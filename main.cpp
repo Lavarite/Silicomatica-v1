@@ -139,52 +139,70 @@ int main() {
     font.dwFontSize.Y = 10;
 
     SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
+    SetCurrentConsoleFontEx(hOut, 0, &font);
     ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
     set_cursor(false);
 
 
     World world;
     Player player;
-    POINT mCoord;
     world.addPlayer(player);
+    POINT mCoord;
     COORD topLeft = { 0, 0 };
 
-    vector<string> map = createMap();
-    world.setMap(map);
-    SetConsoleCursorPosition(hOut, topLeft);
-    while (true) {
-        SetConsoleCursorPosition(hOut, topLeft);
-        world.updatePlayer(player);
-        world.printMap(player);
-        if (GetAsyncKeyState(VK_ESCAPE)) {
-            system("cls");
-            Button back;
-            back.height = 3; back.width = 116; back.x = 50; back.y = 10;
-            //Button settings;
-            //Button quit;
-            while (true) {
-                back.print();
-                if (GetAsyncKeyState(VK_LBUTTON)){
-                    GetMouseCursorPos(&mCoord);
-                    if (back.isPressed(mCoord.x, mCoord.y)){
-                        system("cls");
-                        break;
+    Button newWorld, load, settings, exit;
+    newWorld.height = 5; newWorld.width = 20; newWorld.x = 10; newWorld.y = 10; newWorld.text = "New World";
+    load.height = 5; load.width = 20; load.x = 10; load.y = 20; load.text = "Load";
+    settings.height = 5; settings.width = 20; settings.x = 10; settings.y = 30; settings.text = "Settings";
+    exit.height = 5; exit.width = 20; exit.x = 10; exit.y = 40; exit.text = "Exit";
+    while (true){
+        newWorld.print();
+        load.print();
+        settings.print();
+        exit.print();
+        while (true){
+            if (GetAsyncKeyState(VK_LBUTTON)){
+                GetMouseCursorPos(&mCoord);
+                if (exit.isPressed(mCoord.x, mCoord.y)) {
+                    system("cls");
+                    Button yes,no,areyousure;
+                    areyousure.height = 3; areyousure.width = 32; areyousure.x = 93; areyousure.y = 10; areyousure.text = "Are you sure you want to exit?";
+                    yes.height = 5; yes.width = 100; yes.x = 58; yes.y = 24; yes.text = "Yes";
+                    no.height = 5; no.width = 100; no.x = 58; no.y = 48; no.text = "No";
+                    yes.print();
+                    no.print();
+                    areyousure.print();
+                    bool confirm = false;
+                    while (!confirm){
+                        if (GetAsyncKeyState(VK_LBUTTON)){
+                            GetMouseCursorPos(&mCoord);
+                            if (yes.isPressed(mCoord.x, mCoord.y)) {
+                                return 0;
+                            }
+                            if (no.isPressed(mCoord.x, mCoord.y)) {
+                                system("cls");
+                                confirm = true;
+                            }
+                        }
                     }
+                    break;
                 }
+                if (newWorld.isPressed(mCoord.x, mCoord.y)) {break;}
+                if (load.isPressed(mCoord.x, mCoord.y)) {break;}
             }
         }
-        else if (GetAsyncKeyState(VK_LBUTTON)) {
-            GetMouseCursorPos(&mCoord);
-            cout << mCoord.x << " " << mCoord.y << endl;
+        system("cls");
+        vector<string> map = createMap();
+        world.setMap(map);
+        SetConsoleCursorPosition(hOut, topLeft);
+        while (!player.controller(world.getMap())) {
+            SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
+            SetConsoleCursorPosition(hOut, topLeft);
+            world.updatePlayer(player);
+            world.printMap(player);
         }
-        else if (GetAsyncKeyState(VK_UP)) player.setSymbol("^");
-        else if (GetAsyncKeyState(VK_DOWN)) player.setSymbol("v");
-        else if (GetAsyncKeyState(VK_LEFT)) player.setSymbol("<");
-        else if (GetAsyncKeyState(VK_RIGHT)) player.setSymbol(">");
-        else if (GetAsyncKeyState(0x57)) player.moveUp(world.getMap());
-        else if (GetAsyncKeyState(0x53)) player.moveDown(world.getMap());
-        else if (GetAsyncKeyState(0x44)) player.moveRight(world.getMap());
-        else if (GetAsyncKeyState(0x41)) player.moveLeft(world.getMap());
+        system("cls");
     }
+
 }
 

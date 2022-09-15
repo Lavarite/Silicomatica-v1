@@ -24,7 +24,7 @@ public:
         for (int i = 0; i < width-1; i++) {
             cout << "-";
         }
-        for (int i = 0; i < (height-1)/2; i++){
+        for (int i = 0; i < (height-2); i++){
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {static_cast<SHORT>(x), static_cast<SHORT>(y+i+1)});
             cout << "|";
             SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {static_cast<SHORT>(x+width), static_cast<SHORT>(y+i+1)});
@@ -34,6 +34,8 @@ public:
         for (int i = 0; i < width-1; i++) {
             cout << "-";
         }
+        SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {static_cast<SHORT>(x+width/2-text.length()/2), static_cast<SHORT>(y+height/2)});
+        cout << text;
     }
 };
 
