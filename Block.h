@@ -15,6 +15,7 @@ public:
     char symbol = ' ';
     string tool = "";
     Item drop;
+    bool interactable = false;
     string getName(){return name;};
     string getType(){return type;};
     char getSymbol(){return symbol;};
@@ -22,6 +23,7 @@ public:
     int getColor(){return color;};
     bool isTransparent(){return transparent;};
     string getTool(){return tool;}
+    bool isInteractable(){return interactable;};
     void setName(string name){this->name = name;};
     void setType(string type){this->type = type;};
     void setSymbol(char symbol){this->symbol = symbol;};
@@ -29,6 +31,7 @@ public:
     void setTransparent(bool transparent){this->transparent = transparent;};
     void setTool(string tool){this->tool = tool;};
     void setColor(int color){this->color = color;};
+    void setInteractable(bool b){this->interactable = b;};
 };
 
 

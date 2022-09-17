@@ -9,20 +9,24 @@ using namespace std;
 
 class Inventory {
 public:
+    int size;
     vector<Item> items;
     void addItem(Item item){
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < size; i++) {
             if (items[i].getName() == item.getName()) {
                 items[i].setQuantity(items[i].getQuantity() + item.getQuantity());
                 return;
             }
         }
-        if (items.size() < 9) {
-            items.push_back(item);
+        for (int i = 0; i < size; i++) {
+            if (items[i].getQuantity() == 0) {
+                items[i] = item;
+                return;
+            }
         }
     };
     void removeItem(Item item){
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < size; i++) {
             if (items[i].getName() == item.getName()) {
                 items[i].setQuantity(items[i].getQuantity() - item.getQuantity());
                 if (items[i].getQuantity() <= 0) {
@@ -35,5 +39,9 @@ public:
             }
         }
     };
+    void moveItem(Item item, Inventory *i){
+        this->removeItem(item);
+        i->addItem(item);
+    }
 };
 #endif
