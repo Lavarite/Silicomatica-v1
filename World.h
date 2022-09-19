@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <filesystem>
 #include "Player.h"
 #include "Block.h"
 #include "PerlinNoise.h"
@@ -12,8 +13,11 @@ using namespace std;
 
 class World {
 public:
+    string name = "Unnamed World";
+
+
     int size = 100;
-    int seed = 0;
+    short seed = 0;
 
     int getSeed() { return seed; };
 
@@ -25,7 +29,7 @@ public:
 
 
     vector<Player> players;
-    vector<vector<Block>> map = vector<vector<Block>>(size, vector<Block>(size));
+    vector<vector<Block>> map;
 
 
     Block getBlock(int x, int y) {
@@ -50,36 +54,21 @@ public:
             block.setTool("Axe");
             block.setTransparent(false);
             block.setColor(6);
-            Item drop;
-            drop.setName("Wood");
-            drop.setQuantity(1);
-            drop.setType("placeable");
-            drop.setSymbol("|");
-            block.setDrop(drop);
+            block.setDrop(1);
         } else if (b == '#') {
             block.setName("Stone");
             block.setType("stone");
             block.setTool("Pickaxe");
             block.setTransparent(false);
             block.setColor(8);
-            Item drop;
-            drop.setName("Stone");
-            drop.setQuantity(1);
-            drop.setType("placeable");
-            drop.setSymbol("#");
-            block.setDrop(drop);
+            block.setDrop(2);
         } else if (b == '*') {
             block.setName("Sand");
             block.setType("sand");
             block.setTool("Shovel");
             block.setTransparent(true);
             block.setColor(14);
-            Item drop;
-            drop.setName("Sand");
-            drop.setQuantity(1);
-            drop.setType("placeable");
-            drop.setSymbol("*");
-            block.setDrop(drop);
+            block.setDrop(3);
         } else if (b == ',') {
             block.setName("Water");
             block.setType("liquid");
@@ -163,24 +152,139 @@ public:
     }
 
     void generate(unsigned int Seed) {
+        map = vector<vector<Block>>(size, vector<Block>(size));
         PerlinNoise pn(Seed);
         for (int i = 0; i < size; ++i) {     // y
             for (int j = 0; j < size; ++j) {  // x
-                double x = (double) j / ((double) size);
-                double y = (double) i / ((double) size);
-                double n = pn.noise(10 * x, 10 * y, 0.8);
+                //double x = (double) j / ((double) size);
+                //double y = (double) i / ((double) size);
+                double n = pn.noise(((double) j / 10), ((double) i / 10), 0.8);
                 if (n < 0.2) {
                     this->setBlock(i, j, ',');
-                } else if (n >= 0.2 && n < 0.32) {
-                    this->setBlock(i, j, '*');
-                } else if (n >= 0.32 && n < 0.4) {
+                } else if (n >= 0.2 && n < 0.3) {
                     this->setBlock(i, j, '|');
-                } else if (n >= 0.4 && n < 0.65) {
+                } else if (n >= 0.3 && n < 0.37) {
+                    this->setBlock(i, j, '*');
+                } else if (n >= 0.37 && n < 0.68) {
                     this->setBlock(i, j, '-');
                 } else {
                     this->setBlock(i, j, '#');
                 }
             }
+        }
+    }
+
+    void saveFile() {
+        fstream file;
+        file.open("../saves/" + name + ".txt", ios::out);
+        if (file.is_open()) {
+            file << name << endl;
+            file << seed << endl;
+            file << size << endl;
+            file << endl;
+            file << "Blocks:" << endl;
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    file << map[i][j].name << " ";
+                }
+                file << endl;
+                for (int j = 0; j < size; j++) {
+                    file << map[i][j].type << " ";
+                }
+                file << endl;
+                for (int j = 0; j < size; j++) {
+                    file << map[i][j].color << " ";
+                }
+                file << endl;
+                for (int j = 0; j < size; j++) {
+                    file << map[i][j].transparent << " ";
+                }
+                file << endl;
+                for (int j = 0; j < size; j++) {
+                    file << map[i][j].symbol << " ";
+                }
+                file << endl;
+                for (int j = 0; j < size; j++) {
+                    file << map[i][j].tool << " ";
+                }
+                file << endl;
+                for (int j = 0; j < size; j++) {
+                    file << map[i][j].interactable << " ";
+                }
+                file << endl;
+                file << endl;
+                for (int j = 0; j < size; j++) {
+                    file << map[i][j].drop << " ";
+                }
+            }
+            file << endl;
+            file << "Players:" << endl;
+            for (int playerN = 0; playerN < players.size(); playerN++) {
+                //save every property in player:
+                file << players[playerN].name << endl;
+                file << players[playerN].x << endl;
+                file << players[playerN].y << endl;
+                file << players[playerN].color << endl;
+                file << players[playerN].symbol << endl;
+                file << players[playerN].selectedSlot << endl;
+                /*file << "Inventory:" << endl;
+                for (int itemsN = 0; itemsN < players[playerN].inventory.size; itemsN++) {
+                    file << players[playerN].inventory.items[itemsN].name << endl;
+                    file << players[playerN].inventory.items[itemsN].quantity << endl;
+                    file << players[playerN].inventory.items[itemsN].type << endl;
+                    file << players[playerN].inventory.items[itemsN].symbol << endl;
+                    file << endl;
+                }*/
+
+                file << endl;
+            }
+        }
+    }
+
+    void loadFile(string dir) {
+        fstream file;
+        file.open(dir, ios::in);
+        if (file.is_open()) {
+            string line;
+            getline(file, line);
+            name = line;
+            getline(file, line);
+            seed = stoi(line);
+            getline(file, line);
+            size = stoi(line);
+            getline(file, line);
+            getline(file, line);
+            map = vector<vector<Block>>(size, vector<Block>(size));
+            char *info;
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    file >> map[i][j].name;
+                }
+                for (int j = 0; j < size; j++) {
+                    file >> map[i][j].type;
+                }
+                for (int j = 0; j < size; j++) {
+                    file >> map[i][j].color;
+                }
+                for (int j = 0; j < size; j++) {
+                    file >> map[i][j].transparent;
+                }
+                for (int j = 0; j < size; j++) {
+                    file >> map[i][j].symbol;
+                }
+                for (int j = 0; j < size; j++) {
+                    file >> map[i][j].tool;
+                }
+                for (int j = 0; j < size; j++) {
+                    file >> map[i][j].interactable;
+                }
+                getline(file, line);
+                for (int j = 0; j < size; j++) {
+                    file >> map[i][j].drop;
+                }
+            }
+            getline(file, line);
+            getline(file, line);
         }
     }
 };
