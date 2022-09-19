@@ -45,7 +45,6 @@ void gameLoop(Player &player, World &world) {
         clearKeyboardBuffer();
     }
     system("cls");
-    delete &world;
 }
 
 int main() {
