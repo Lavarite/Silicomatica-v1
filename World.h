@@ -212,7 +212,6 @@ public:
                     file << map[i][j].interactable << " ";
                 }
                 file << endl;
-                file << endl;
                 for (int j = 0; j < size; j++) {
                     file << map[i][j].drop << " ";
                 }
@@ -220,7 +219,6 @@ public:
             file << endl;
             file << "Players:" << endl;
             for (int playerN = 0; playerN < players.size(); playerN++) {
-                //save every property in player:
                 file << players[playerN].name << endl;
                 file << players[playerN].x << endl;
                 file << players[playerN].y << endl;
@@ -278,7 +276,6 @@ public:
                 for (int j = 0; j < size; j++) {
                     file >> map[i][j].interactable;
                 }
-                getline(file, line);
                 for (int j = 0; j < size; j++) {
                     file >> map[i][j].drop;
                 }

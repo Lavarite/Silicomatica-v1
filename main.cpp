@@ -54,6 +54,8 @@ int main() {
     font.dwFontSize.X = 10;
     font.dwFontSize.Y = 10;
 
+    SetConsoleCP(437);
+    SetConsoleOutputCP(437);
     SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
     SetCurrentConsoleFontEx(hOut, 0, &font);
     ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
@@ -61,7 +63,6 @@ int main() {
 
 
     POINT mCoord;
-    COORD topLeft = {0, 0};
 
     Button newWorld, load, settings, exit;
     newWorld.height = 5;
@@ -86,6 +87,7 @@ int main() {
     exit.text = "Exit";
 
     while (true) {
+        SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
         clearKeyboardBuffer();
         newWorld.print();
         load.print();
@@ -116,6 +118,7 @@ int main() {
                 areyousure.print();
                 clearKeyboardBuffer();
                 while (true) {
+                    SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
                     if (GetAsyncKeyState(VK_LBUTTON)) {
                         GetMouseCursorPos(&mCoord);
                         if (yes.isPressed(mCoord.x, mCoord.y)) {
@@ -165,6 +168,7 @@ int main() {
                 create.y = 40;
                 create.text = "Create the world";
                 while (true) {
+                    SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
                     clearKeyboardBuffer();
                     name.text = "Name: " + world.name;
                     size.text = "Size: " + to_string(world.size) + "x" + to_string(world.size);
@@ -270,6 +274,7 @@ int main() {
                     worlds.push_back(b);
                 }
                 while (true) {
+                    SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
                     clearKeyboardBuffer();
                     for (int i = 0; i < worlds.size(); i++) {
                         worlds[i].print();
@@ -286,6 +291,7 @@ int main() {
                                 world.addPlayer(player);
                                 gameLoop(world.players[0], world);
                                 world.saveFile();
+                                SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
                                 break;
                             }
                         }
