@@ -156,8 +156,6 @@ public:
         PerlinNoise pn(Seed);
         for (int i = 0; i < size; ++i) {     // y
             for (int j = 0; j < size; ++j) {  // x
-                //double x = (double) j / ((double) size);
-                //double y = (double) i / ((double) size);
                 double n = pn.noise(((double) j / 10), ((double) i / 10), 0.8);
                 if (n < 0.2) {
                     this->setBlock(i, j, ',');

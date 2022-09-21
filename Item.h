@@ -29,5 +29,19 @@ public:
 
     void setSymbol(string symbol) { this->symbol = symbol; };
 };
+namespace item {
+#define WOOD 1
+#define STONE 2
+#define WORKBENCH 3
+#define PICKAXE 4
+#define AXE 5
+#define SHOVEL 6
+#define WATER_SCAFFOLDING 7
+#define MECHANICAL_SIEVE 8
+#define MECHANICAL_CRUSHER 9
 
+    Item get(int ITEM_ID) {
+
+    }
+}
 #endif

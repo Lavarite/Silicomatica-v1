@@ -15,7 +15,7 @@ public:
     string type = "";
     int color = 7;
     bool transparent = true;
-    char symbol = '/';
+    string symbol = "/";
     string tool = "";
     int drop = 0;
     bool interactable = false;
@@ -24,7 +24,7 @@ public:
 
     string getType() { return type; };
 
-    char getSymbol() { return symbol; };
+    string getSymbol() { return symbol; };
 
     int getDrop() { return drop; };
 

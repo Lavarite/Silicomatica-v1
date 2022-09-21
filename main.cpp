@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
+#include <io.h>
+#include <fcntl.h>
 #include "Inventory.h"
 #include "Player.h"
 #include "World.h"
@@ -54,8 +56,9 @@ int main() {
     font.dwFontSize.X = 10;
     font.dwFontSize.Y = 10;
 
-    SetConsoleCP(437);
-    SetConsoleOutputCP(437);
+
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
     SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
     SetCurrentConsoleFontEx(hOut, 0, &font);
     ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
@@ -63,6 +66,7 @@ int main() {
 
 
     POINT mCoord;
+    
 
     Button newWorld, load, settings, exit;
     newWorld.height = 5;
