@@ -55,10 +55,12 @@ int main() {
     font.FontWeight = 700;
     font.dwFontSize.X = 10;
     font.dwFontSize.Y = 10;
-
+    wcscpy(font.FaceName, L"Cascadia Code");
+    SetCurrentConsoleFontEx(hOut, 0, &font);
 
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
+    SetConsoleCP(437);
     SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
     SetCurrentConsoleFontEx(hOut, 0, &font);
     ShowWindow(GetConsoleWindow(), SW_MAXIMIZE);
@@ -66,30 +68,12 @@ int main() {
 
 
     POINT mCoord;
-    
 
-    Button newWorld, load, settings, exit;
-    newWorld.height = 5;
-    newWorld.width = 20;
-    newWorld.x = 10;
-    newWorld.y = 10;
-    newWorld.text = "New World";
-    load.height = 5;
-    load.width = 20;
-    load.x = 10;
-    load.y = 20;
-    load.text = "Load";
-    settings.height = 5;
-    settings.width = 20;
-    settings.x = 10;
-    settings.y = 30;
-    settings.text = "Settings";
-    exit.height = 5;
-    exit.width = 20;
-    exit.x = 10;
-    exit.y = 40;
-    exit.text = "Exit";
 
+    Button newWorld{10, 10, 5, 20, "New World"}, load{10, 20, 5, 20, "Load World"}, settings{10, 30, 5, 20,
+                                                                                             "Settings"}, exit{10, 40,
+                                                                                                               5, 20,
+                                                                                                               "Exit"};
     while (true) {
         SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
         clearKeyboardBuffer();
@@ -101,22 +85,8 @@ int main() {
             GetMouseCursorPos(&mCoord);
             if (exit.isPressed(mCoord.x, mCoord.y)) {
                 system("cls");
-                Button yes, no, areyousure;
-                areyousure.height = 3;
-                areyousure.width = 32;
-                areyousure.x = 93;
-                areyousure.y = 10;
-                areyousure.text = "Are you sure you want to exit?";
-                yes.height = 5;
-                yes.width = 100;
-                yes.x = 58;
-                yes.y = 24;
-                yes.text = "Yes";
-                no.height = 5;
-                no.width = 100;
-                no.x = 58;
-                no.y = 48;
-                no.text = "No";
+                Button yes{58, 24, 5, 100, "Yes"}, no{58, 48, 5, 100, "No"}, areyousure{93, 10, 3, 32,
+                                                                                        "Are you sure you want to exit?"};
                 yes.print();
                 no.print();
                 areyousure.print();
@@ -145,32 +115,9 @@ int main() {
                 world.seed = 0;
                 world.size = 100;
                 Player player;
-                Button name, size, seed, returnToMenu, create;
-                name.width = 40;
-                name.height = 5;
-                name.x = 50;
-                name.y = 10;
-                name.text = "Name: ";
-                size.width = 40;
-                size.height = 5;
-                size.x = 50;
-                size.y = 20;
-                size.text = "Size: 100x100";
-                seed.width = 40;
-                seed.height = 5;
-                seed.x = 50;
-                seed.y = 30;
-                seed.text = "Seed: 0";
-                returnToMenu.width = 40;
-                returnToMenu.height = 5;
-                returnToMenu.x = 100;
-                returnToMenu.y = 40;
-                returnToMenu.text = "Return to menu";
-                create.width = 40;
-                create.height = 5;
-                create.x = 50;
-                create.y = 40;
-                create.text = "Create the world";
+                Button name{50, 10, 5, 40, "Name: "}, size{50, 20, 5, 40, "Size: 100x100"}, seed{50, 30, 5, 40,
+                                                                                                 "Seed: 0"}, returnToMenu{
+                        100, 40, 5, 40, "Return to menu"}, create{50, 40, 5, 40, "Create the world"};
                 while (true) {
                     SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
                     clearKeyboardBuffer();
@@ -269,13 +216,8 @@ int main() {
                 returnToMenu.y = 50;
                 returnToMenu.text = "Return to menu";
                 for (const auto &entry: filesystem::directory_iterator(path)) {
-                    Button b;
-                    b.setText(entry.path().filename().string().substr(0, entry.path().filename().string().size() - 4));
-                    b.x = 50;
-                    b.y = 10 + worlds.size() * 3;
-                    b.width = 50;
-                    b.height = 3;
-                    worlds.push_back(b);
+                    Button b{50, (int) (10 + worlds.size() * 3), 3, 50,
+                             entry.path().filename().string().substr(0, entry.path().filename().string().size() - 4)};
                 }
                 while (true) {
                     SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);

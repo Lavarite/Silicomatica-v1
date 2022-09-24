@@ -44,34 +44,34 @@ public:
         Block block;
         if (b == '-') {
             block.setName("Air");
-            block.setType("gas");
+            block.setType("Block");
             block.setTool("None");
             block.setTransparent(true);
             block.setColor(2);
         } else if (b == '|') {
             block.setName("Wood");
-            block.setType("wood");
+            block.setType("Block");
             block.setTool("Axe");
             block.setTransparent(false);
             block.setColor(6);
             block.setDrop(1);
         } else if (b == '#') {
             block.setName("Stone");
-            block.setType("stone");
+            block.setType("Block");
             block.setTool("Pickaxe");
             block.setTransparent(false);
             block.setColor(8);
             block.setDrop(2);
         } else if (b == '*') {
             block.setName("Sand");
-            block.setType("sand");
-            block.setTool("Shovel");
+            block.setType("Block");
+            block.setTool("Pickaxe");
             block.setTransparent(true);
             block.setColor(14);
             block.setDrop(3);
         } else if (b == ',') {
             block.setName("Water");
-            block.setType("liquid");
+            block.setType("Block");
             block.setTool("None");
             block.setTransparent(true);
             block.setColor(9);
@@ -179,43 +179,23 @@ public:
             file << name << endl;
             file << seed << endl;
             file << size << endl;
+            file << players.size() << endl;
             file << endl;
-            file << "Blocks:" << endl;
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
-                    file << map[i][j].name << " ";
-                }
-                file << endl;
-                for (int j = 0; j < size; j++) {
+                    file << i << " " << j << " ";
                     file << map[i][j].type << " ";
-                }
-                file << endl;
-                for (int j = 0; j < size; j++) {
+                    file << map[i][j].name << " ";
                     file << map[i][j].color << " ";
-                }
-                file << endl;
-                for (int j = 0; j < size; j++) {
                     file << map[i][j].transparent << " ";
-                }
-                file << endl;
-                for (int j = 0; j < size; j++) {
                     file << map[i][j].symbol << " ";
-                }
-                file << endl;
-                for (int j = 0; j < size; j++) {
                     file << map[i][j].tool << " ";
-                }
-                file << endl;
-                for (int j = 0; j < size; j++) {
                     file << map[i][j].interactable << " ";
-                }
-                file << endl;
-                for (int j = 0; j < size; j++) {
                     file << map[i][j].drop << " ";
+                    file << endl;
                 }
             }
             file << endl;
-            file << "Players:" << endl;
             for (int playerN = 0; playerN < players.size(); playerN++) {
                 file << players[playerN].name << endl;
                 file << players[playerN].x << endl;
@@ -223,14 +203,12 @@ public:
                 file << players[playerN].color << endl;
                 file << players[playerN].symbol << endl;
                 file << players[playerN].selectedSlot << endl;
-                /*file << "Inventory:" << endl;
+                file << players[playerN].inventory.size << endl;
                 for (int itemsN = 0; itemsN < players[playerN].inventory.size; itemsN++) {
-                    file << players[playerN].inventory.items[itemsN].name << endl;
-                    file << players[playerN].inventory.items[itemsN].quantity << endl;
-                    file << players[playerN].inventory.items[itemsN].type << endl;
-                    file << players[playerN].inventory.items[itemsN].symbol << endl;
+                    file << players[playerN].inventory.items[itemsN].id << " "
+                         << players[playerN].inventory.items[itemsN].quantity << endl;
                     file << endl;
-                }*/
+                }
 
                 file << endl;
             }
