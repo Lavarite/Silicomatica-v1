@@ -11,7 +11,7 @@ class Player {
 public:
     Inventory inventory;
     string name = "";
-    int color = 9;
+    int color = 7;
     string symbol = "^";
     int x = 20;
     int y = 20;
@@ -109,115 +109,68 @@ public:
 
     bool controller(vector<vector<Block>> map) {
         POINT mCoord;
-        while (true) {
-            if (GetAsyncKeyState(VK_ESCAPE)) {
-                system("cls");
-                Button back;
-                back.height = 4;
-                back.width = 116;
-                back.x = 50;
-                back.y = 10;
-                back.text = "Back to the game";
-                Button settings;
-                settings.height = 4;
-                settings.width = 100;
-                settings.x = 58;
-                settings.y = 24;
-                settings.text = "Settings";
-                Button exit;
-                exit.height = 4;
-                exit.width = 108;
-                exit.x = 54;
-                exit.y = 38;
-                exit.text = "Save & Exit";
+        GetMouseCursorPos(&mCoord);
+        if (GetAsyncKeyState(VK_ESCAPE)) {
+            system("cls");
+            Button back{50, 10, 4, 116, "Back to the game"};
+            Button settings{58, 24, 4, 100, "Settings"};
+            Button exit{54, 38, 4, 108, "Exit & Exit"};
+            while (true) {
                 back.print();
                 settings.print();
                 exit.print();
-                while (true) {
-                    if (GetAsyncKeyState(VK_LBUTTON)) {
-                        GetMouseCursorPos(&mCoord);
-                        if (back.isPressed(mCoord.x, mCoord.y)) {
-                            system("cls");
-                            break;
-                        }
-                        if (exit.isPressed(mCoord.x, mCoord.y)) {
-                            system("cls");
-                            Button yes, no, areyousure;
-                            areyousure.height = 3;
-                            areyousure.width = 32;
-                            areyousure.x = 93;
-                            areyousure.y = 10;
-                            areyousure.text = "Are you sure you want to exit?";
-                            yes.height = 5;
-                            yes.width = 100;
-                            yes.x = 58;
-                            yes.y = 24;
-                            yes.text = "Yes";
-                            no.height = 5;
-                            no.width = 100;
-                            no.x = 58;
-                            no.y = 48;
-                            no.text = "No";
-                            yes.print();
-                            no.print();
-                            areyousure.print();
-                            bool confirm = false;
-                            while (!confirm) {
-                                if (GetAsyncKeyState(VK_LBUTTON)) {
-                                    GetMouseCursorPos(&mCoord);
-                                    if (yes.isPressed(mCoord.x, mCoord.y)) {
-                                        return true;
-                                    }
-                                    if (no.isPressed(mCoord.x, mCoord.y)) {
-                                        system("cls");
-                                        confirm = true;
-                                    }
+                if (GetAsyncKeyState(VK_LBUTTON)) {
+                    if (back.isPressed(mCoord.x, mCoord.y)) {
+                        system("cls");
+                        break;
+                    }
+                    if (exit.isPressed(mCoord.x, mCoord.y)) {
+                        system("cls");
+                        Button yes{58, 24, 5, 100, "Yes"}, no{58, 48, 5, 100, "No"}, areyousure{93, 10, 3, 32,
+                                                                                                "Are you sure you want to exit?"};
+                        yes.print();
+                        no.print();
+                        areyousure.print();
+                        bool confirm = false;
+                        while (!confirm) {
+                            if (GetAsyncKeyState(VK_LBUTTON)) {
+                                GetMouseCursorPos(&mCoord);
+                                if (yes.isPressed(mCoord.x, mCoord.y)) {
+                                    return true;
+                                }
+                                if (no.isPressed(mCoord.x, mCoord.y)) {
+                                    system("cls");
+                                    confirm = true;
                                 }
                             }
-                            break;
                         }
+                        break;
                     }
                 }
-                break;
-            } else if (GetAsyncKeyState(VK_LBUTTON)) {
-                GetMouseCursorPos(&mCoord);
-                cout << mCoord.x << " " << mCoord.y << endl;
-                break;
-            } else if (GetAsyncKeyState(VK_UP)) {
-                this->setSymbol("^");
-                break;
             }
-            else if (GetAsyncKeyState(VK_DOWN)) {
-                this->setSymbol("v");
-                break;
-            }
-            else if (GetAsyncKeyState(VK_LEFT)) {
-                this->setSymbol("<");
-                break;
-            }
-            else if (GetAsyncKeyState(VK_RIGHT)) {
-                this->setSymbol(">");
-                break;
-            }
-            else if (GetAsyncKeyState(0x57)) {
-                this->moveUp(map);
-                break;
-            }
-            else if (GetAsyncKeyState(0x53)) {
-                this->moveDown(map);
-                break;
-            }
-            else if (GetAsyncKeyState(0x44)) {
-                this->moveRight(map);
-                break;
-            }
-            else if (GetAsyncKeyState(0x41)) {
-                this->moveLeft(map);
-                break;
-            }
-            return false;
+        } else if (GetAsyncKeyState(VK_LBUTTON)) {
+            GetMouseCursorPos(&mCoord);
+            cout << mCoord.x << " " << mCoord.y << endl;
+        } else if (GetAsyncKeyState(VK_UP)) {
+            this->setSymbol("^");
+        } else if (GetAsyncKeyState(VK_DOWN)) {
+            this->setSymbol("v");
+        } else if (GetAsyncKeyState(VK_LEFT)) {
+            this->setSymbol("<");
+        } else if (GetAsyncKeyState(VK_RIGHT)) {
+            this->setSymbol(">");
+        } else if (GetAsyncKeyState(0x57)) {
+            this->moveUp(map);
+        } else if (GetAsyncKeyState(0x53)) {
+            this->moveDown(map);
+        } else if (GetAsyncKeyState(0x44)) {
+            this->moveRight(map);
+        } else if (GetAsyncKeyState(0x41)) {
+            this->moveLeft(map);
         }
+        return false;
     }
+    //}
 };
 
 #endif

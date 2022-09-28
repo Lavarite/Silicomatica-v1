@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wc++11-narrowing"
 #ifndef TOO_HOT_OUTSIDE_FOR_A_BIT_TOO_LONG_WORLD_H
 #define TOO_HOT_OUTSIDE_FOR_A_BIT_TOO_LONG_WORLD_H
 
@@ -13,7 +15,7 @@ using namespace std;
 
 class World {
 public:
-    string name = "Unnamed World";
+    string name = "Unnamed";
 
 
     int size = 100;
@@ -104,13 +106,13 @@ public:
         players.erase(players.begin() + this->findPlayer(player));
     };
 
-    void addPlayer(Player player) {
+    void addPlayer(const Player &player) {
         players.push_back(player);
     };
 
-    int findPlayer(string name) {
+    int findPlayer(string Name) {
         for (int i = 0; i < players.size(); i++) {
-            if (players[i].getName() == name) {
+            if (players[i].getName() == Name) {
                 return i;
             }
         }
@@ -125,25 +127,36 @@ public:
         static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
         COORD topLeft = {0, 0};
         SetConsoleCursorPosition(hOut, topLeft);
-        cout << "Coordinates: " << player.getX() << ", " << player.getY() << endl;
+        cout << "                                                 ";
+        SetConsoleCursorPosition(hOut, topLeft);
+        cout << "Coordinates: " << player.getX() << ", " << player.getY() << " Name: " << player.name << endl;
         int x, y;
         x = player.getX();
         y = player.getY();
+        bool isP = false;
         for (int i = y - 15; i < y + 15; i++) {
             for (int j = x - 15; j < x + 15; j++) {
+                isP = false;
                 if (i < 0 || j < 0 || i >= size || j >= size) {
                     cout << "  ";
                 } else {
                     for (int k = 0; k < players.size(); k++) {
                         if (players[k].getX() == j && players[k].getY() == i) {
                             SetConsoleTextAttribute(hOut, player.getColor());
-                            cout << players[k].getSymbol() << " ";
+                            cout << players[k].getSymbol();
                             SetConsoleTextAttribute(hOut, 7);
+                            cout << " ";
+                            isP = true;
+                            break;
                         } else {
-                            SetConsoleTextAttribute(hOut, map[i][j].getColor());
-                            cout << map[i][j].getSymbol() << " ";
-                            SetConsoleTextAttribute(hOut, 7);
+                            isP = false;
                         }
+                    }
+                    if (!isP) {
+                        SetConsoleTextAttribute(hOut, map[i][j].getColor());
+                        cout << map[i][j].getSymbol();
+                        SetConsoleTextAttribute(hOut, 7);
+                        cout << " ";
                     }
                 }
             }
@@ -176,10 +189,7 @@ public:
         fstream file;
         file.open("../saves/" + name + ".txt", ios::out);
         if (file.is_open()) {
-            file << name << endl;
-            file << seed << endl;
-            file << size << endl;
-            file << players.size() << endl;
+            file << name << " " << seed << " " << size << endl;
             file << endl;
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
@@ -191,73 +201,60 @@ public:
                     file << map[i][j].symbol << " ";
                     file << map[i][j].tool << " ";
                     file << map[i][j].interactable << " ";
-                    file << map[i][j].drop << " ";
-                    file << endl;
+                    file << map[i][j].drop << endl;
                 }
             }
-            file << endl;
+            file << players.size() << endl;
             for (int playerN = 0; playerN < players.size(); playerN++) {
-                file << players[playerN].name << endl;
-                file << players[playerN].x << endl;
-                file << players[playerN].y << endl;
-                file << players[playerN].color << endl;
-                file << players[playerN].symbol << endl;
-                file << players[playerN].selectedSlot << endl;
-                file << players[playerN].inventory.size << endl;
-                for (int itemsN = 0; itemsN < players[playerN].inventory.size; itemsN++) {
+                file << players[playerN].name << " " << players[playerN].x << " " << players[playerN].y << " "
+                     << players[playerN].color << " "
+                     << players[playerN].symbol << " " << players[playerN].selectedSlot << " " << endl;
+                for (int itemsN = 0; itemsN < 9; itemsN++) {
                     file << players[playerN].inventory.items[itemsN].id << " "
                          << players[playerN].inventory.items[itemsN].quantity << endl;
-                    file << endl;
                 }
-
-                file << endl;
             }
         }
     }
 
-    void loadFile(string dir) {
+    void loadFile(const string &dir) {
         fstream file;
         file.open(dir, ios::in);
         if (file.is_open()) {
             string line;
             getline(file, line);
-            name = line;
-            getline(file, line);
-            seed = stoi(line);
-            getline(file, line);
-            size = stoi(line);
-            getline(file, line);
+            stringstream s(line);
+            s >> name >> seed >> size;
             getline(file, line);
             map = vector<vector<Block>>(size, vector<Block>(size));
-            char *info;
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
-                    file >> map[i][j].name;
-                }
-                for (int j = 0; j < size; j++) {
-                    file >> map[i][j].type;
-                }
-                for (int j = 0; j < size; j++) {
-                    file >> map[i][j].color;
-                }
-                for (int j = 0; j < size; j++) {
-                    file >> map[i][j].transparent;
-                }
-                for (int j = 0; j < size; j++) {
-                    file >> map[i][j].symbol;
-                }
-                for (int j = 0; j < size; j++) {
-                    file >> map[i][j].tool;
-                }
-                for (int j = 0; j < size; j++) {
-                    file >> map[i][j].interactable;
-                }
-                for (int j = 0; j < size; j++) {
-                    file >> map[i][j].drop;
+                    getline(file, line);
+                    stringstream ss(line);
+                    Block block;
+                    int x, y;
+                    ss >> x >> y >> block.type >> block.name >> block.color >> block.transparent >> block.symbol
+                       >> block.tool >> block.interactable >> block.drop;
+                    map[x][y] = block;
                 }
             }
             getline(file, line);
-            getline(file, line);
+            int pM = stoi(line);
+            for (int playerN = 0; playerN < pM; playerN++) {
+                Player player;
+                getline(file, line);
+                stringstream ss(line);
+                ss >> player.name >> player.x >> player.y >> player.color >> player.symbol >> player.selectedSlot;
+                for (int itemsN = 0; itemsN < 9; itemsN++) {
+                    getline(file, line);
+                    stringstream ss(line);
+                    int id, quantity;
+                    ss >> id >> quantity;
+                    player.inventory.items[itemsN] = Material::get(id);
+                    player.inventory.items[itemsN].quantity = quantity;
+                }
+                players.push_back(player);
+            }
         }
     }
 };

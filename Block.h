@@ -17,8 +17,8 @@ public:
     bool transparent = true;
     string symbol = "/";
     string tool = "";
-    int drop = 0;
     bool interactable = false;
+    int drop = 0;
 
     string getName() { return name; };
 
