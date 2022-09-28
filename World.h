@@ -15,7 +15,7 @@ using namespace std;
 
 class World {
 public:
-    string name = "Unnamed World";
+    string name = "Unnamed";
 
 
     int size = 100;
@@ -106,13 +106,13 @@ public:
         players.erase(players.begin() + this->findPlayer(player));
     };
 
-    void addPlayer(Player player) {
+    void addPlayer(const Player &player) {
         players.push_back(player);
     };
 
-    int findPlayer(string name) {
+    int findPlayer(string Name) {
         for (int i = 0; i < players.size(); i++) {
-            if (players[i].getName() == name) {
+            if (players[i].getName() == Name) {
                 return i;
             }
         }
@@ -133,21 +133,30 @@ public:
         int x, y;
         x = player.getX();
         y = player.getY();
+        bool isP = false;
         for (int i = y - 15; i < y + 15; i++) {
             for (int j = x - 15; j < x + 15; j++) {
+                isP = false;
                 if (i < 0 || j < 0 || i >= size || j >= size) {
                     cout << "  ";
                 } else {
                     for (int k = 0; k < players.size(); k++) {
                         if (players[k].getX() == j && players[k].getY() == i) {
                             SetConsoleTextAttribute(hOut, player.getColor());
-                            cout << players[k].getSymbol() << " ";
+                            cout << players[k].getSymbol();
                             SetConsoleTextAttribute(hOut, 7);
+                            cout << " ";
+                            isP = true;
+                            break;
                         } else {
-                            SetConsoleTextAttribute(hOut, map[i][j].getColor());
-                            cout << map[i][j].getSymbol() << " ";
-                            SetConsoleTextAttribute(hOut, 7);
+                            isP = false;
                         }
+                    }
+                    if (!isP) {
+                        SetConsoleTextAttribute(hOut, map[i][j].getColor());
+                        cout << map[i][j].getSymbol();
+                        SetConsoleTextAttribute(hOut, 7);
+                        cout << " ";
                     }
                 }
             }
@@ -197,19 +206,18 @@ public:
             }
             file << players.size() << endl;
             for (int playerN = 0; playerN < players.size(); playerN++) {
-                file << players[playerN].name << players[playerN].x << players[playerN].y << players[playerN].color
-                     << players[playerN].symbol << players[playerN].selectedSlot << endl;
+                file << players[playerN].name << " " << players[playerN].x << " " << players[playerN].y << " "
+                     << players[playerN].color << " "
+                     << players[playerN].symbol << " " << players[playerN].selectedSlot << " " << endl;
                 for (int itemsN = 0; itemsN < 9; itemsN++) {
                     file << players[playerN].inventory.items[itemsN].id << " "
                          << players[playerN].inventory.items[itemsN].quantity << endl;
-                    file << endl;
                 }
-                file << endl;
             }
         }
     }
 
-    void loadFile(string dir) {
+    void loadFile(const string &dir) {
         fstream file;
         file.open(dir, ios::in);
         if (file.is_open()) {
@@ -231,7 +239,8 @@ public:
                 }
             }
             getline(file, line);
-            for (int playerN = 0; playerN < stoi(line); playerN++) {
+            int pM = stoi(line);
+            for (int playerN = 0; playerN < pM; playerN++) {
                 Player player;
                 getline(file, line);
                 stringstream ss(line);

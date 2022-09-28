@@ -32,6 +32,7 @@ public:
     void setSymbol(string symbol) { this->symbol = symbol; };
 };
 namespace Material {
+    Item AIR{"Air", 0, " ", " ", 7, 0};
     Item WOOD{"Wood", 1, "block", "|", 6, 1};
     Item STONE{"Stone", 1, "block", "#", 8, 2};
     Item WORKBENCH{"Workbench", 1, "workbench", "%", 6, 3};
@@ -60,7 +61,7 @@ namespace Material {
             case 8:
                 return MECHANICAL_CRUSHER;
             default:
-                return WOOD;
+                return AIR;
         }
     }
 }

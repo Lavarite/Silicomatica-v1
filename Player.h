@@ -109,6 +109,7 @@ public:
 
     bool controller(vector<vector<Block>> map) {
         POINT mCoord;
+        GetMouseCursorPos(&mCoord);
         if (GetAsyncKeyState(VK_ESCAPE)) {
             system("cls");
             Button back{50, 10, 4, 116, "Back to the game"};
@@ -119,7 +120,6 @@ public:
                 settings.print();
                 exit.print();
                 if (GetAsyncKeyState(VK_LBUTTON)) {
-                    GetMouseCursorPos(&mCoord);
                     if (back.isPressed(mCoord.x, mCoord.y)) {
                         system("cls");
                         break;
