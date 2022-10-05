@@ -3,15 +3,16 @@
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
-#include <utility>
 #include "Inventory.h"
 #include "Player.h"
 #include "World.h"
 #include "Button.h"
+#include "Controller.h"
 
 static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 static const HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 static CONSOLE_FONT_INFOEX font;
+Controller controller;
 POINT mCoord;
 
 void clearKeyboardBuffer() {
@@ -28,26 +29,107 @@ void set_cursor(bool visible) {
 }
 
 void GetMouseCursorPos(POINT *mC) {
-    font.cbSize = sizeof(CONSOLE_FONT_INFOEX);
-    GetCurrentConsoleFontEx(hOut, 0, &font);
-    GetCursorPos(mC);
-    mC->y = mC->y - 22.5;
-    mC->x = mC->x / font.dwFontSize.X;
-    mC->y = mC->y / font.dwFontSize.Y;
+    if (controller.irInBuf[0].EventType == MOUSE_EVENT) {
+        mC->x = controller.irInBuf[0].Event.MouseEvent.dwMousePosition.X;
+        mC->y = controller.irInBuf[0].Event.MouseEvent.dwMousePosition.Y;
+        controller.LMB = false;
+        controller.RMB = false;
+        return;
+    }
 }
 
 void gameLoop(Player &player, World &world) {
     system("cls");
     SetConsoleCursorPosition(hOut, {0, 0});
-    while (!player.controller(world.getMap())) {
+    vector<Button> inventoryButtons = vector<Button>(9);
+    for (int i = 0; i < 9; i++) {
+        inventoryButtons[i] = Button{63 + 27 * i, 1, 5, 26};
+    }
+    while (true) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                inventoryButtons[j].color = 7;
+            }
+            inventoryButtons[player.selectedSlot].color = 4;
+            inventoryButtons[i].itemColor = player.inventory.items[i].color;
+            inventoryButtons[i].text = player.inventory.items[i].name;
+            inventoryButtons[i].text1 =
+                    player.inventory.items[i].symbol + " " + to_string(player.inventory.items[i].quantity);
+            inventoryButtons[i].print();
+        }
+        if (controller.LMB) {
+            GetMouseCursorPos(&mCoord);
+            for (int i = 0; i < 9; i++) {
+                if (inventoryButtons[i].isPressed(mCoord.x, mCoord.y)) {
+                    player.selectedSlot = i;
+                }
+            }
+        }
+        if (GetAsyncKeyState(VK_ESCAPE)) {
+            system("cls");
+            Button back{50, 10, 4, 116, "Back to the game"};
+            Button settings{58, 24, 4, 100, "Settings"};
+            Button exit{54, 38, 4, 108, "Save & Exit"};
+            while (true) {
+                back.print();
+                settings.print();
+                exit.print();
+                if (controller.LMB) {
+                    GetMouseCursorPos(&mCoord);
+                    if (back.isPressed(mCoord.x, mCoord.y)) {
+                        system("cls");
+                        break;
+                    }
+                    if (exit.isPressed(mCoord.x, mCoord.y)) {
+                        system("cls");
+                        world.saveFile();
+                        return;
+                    }
+                }
+            }
+        } else if (GetAsyncKeyState(VK_UP)) {
+            player.setSymbol("^");
+        } else if (GetAsyncKeyState(VK_DOWN)) {
+            player.setSymbol("v");
+        } else if (GetAsyncKeyState(VK_LEFT)) {
+            player.setSymbol("<");
+        } else if (GetAsyncKeyState(VK_RIGHT)) {
+            player.setSymbol(">");
+        } else if (GetAsyncKeyState(0x57)) {
+            player.moveUp(world.getMap());
+        } else if (GetAsyncKeyState(0x53)) {
+            player.moveDown(world.getMap());
+        } else if (GetAsyncKeyState(0x44)) {
+            player.moveRight(world.getMap());
+        } else if (GetAsyncKeyState(0x41)) {
+            player.moveLeft(world.getMap());
+        } else if (GetAsyncKeyState(0x31)) {
+            player.selectedSlot = 0;
+        } else if (GetAsyncKeyState(0x32)) {
+            player.selectedSlot = 1;
+        } else if (GetAsyncKeyState(0x33)) {
+            player.selectedSlot = 2;
+        } else if (GetAsyncKeyState(0x34)) {
+            player.selectedSlot = 3;
+        } else if (GetAsyncKeyState(0x35)) {
+            player.selectedSlot = 4;
+        } else if (GetAsyncKeyState(0x36)) {
+            player.selectedSlot = 5;
+        } else if (GetAsyncKeyState(0x37)) {
+            player.selectedSlot = 6;
+        } else if (GetAsyncKeyState(0x38)) {
+            player.selectedSlot = 7;
+        } else if (GetAsyncKeyState(0x39)) {
+            player.selectedSlot = 8;
+        } else if (GetAsyncKeyState(0x30)) {
+            player.selectedSlot = 9;
+        }
         SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
         SetConsoleCursorPosition(hOut, {0, 0});
         world.updatePlayer(player);
         world.printMap(player);
         clearKeyboardBuffer();
     }
-    system("cls");
-    world.saveFile();
 }
 
 void loadWorld() {
@@ -72,7 +154,7 @@ void loadWorld() {
             worlds[i].print();
         }
         returnToMenu.print();
-        if (GetAsyncKeyState(VK_LBUTTON)) {
+        if (controller.LMB) {
             clearKeyboardBuffer();
             GetMouseCursorPos(&mCoord);
             for (int i = 0; i < worlds.size(); i++) {
@@ -122,7 +204,7 @@ void loadWorld() {
                             }
                             clearKeyboardBuffer();
                         }
-                        if (GetAsyncKeyState(VK_LBUTTON)) {
+                        if (controller.LMB) {
                             clearKeyboardBuffer();
                             GetMouseCursorPos(&mCoord);
                             if (ign.isPressed(mCoord.x, mCoord.y)) {
@@ -227,7 +309,7 @@ void createWorld() {
             }
             clearKeyboardBuffer();
         }
-        if (GetAsyncKeyState(VK_LBUTTON)) {
+        if (controller.LMB) {
             clearKeyboardBuffer();
             GetMouseCursorPos(&mCoord);
             if (returnToMenu.isPressed(mCoord.x, mCoord.y)) {
@@ -291,7 +373,7 @@ void createWorld() {
                         }
                         clearKeyboardBuffer();
                     }
-                    if (GetAsyncKeyState(VK_LBUTTON)) {
+                    if (controller.LMB) {
                         clearKeyboardBuffer();
                         GetMouseCursorPos(&mCoord);
                         if (ign.isPressed(mCoord.x, mCoord.y)) {
@@ -346,7 +428,7 @@ int main() {
         load.print();
         settings.print();
         exit.print();
-        if (GetAsyncKeyState(VK_LBUTTON)) {
+        if (controller.LMB) {
             GetMouseCursorPos(&mCoord);
             if (exit.isPressed(mCoord.x, mCoord.y)) {
                 system("cls");
@@ -358,7 +440,7 @@ int main() {
                 clearKeyboardBuffer();
                 while (true) {
                     SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
-                    if (GetAsyncKeyState(VK_LBUTTON)) {
+                    if (controller.LMB) {
                         GetMouseCursorPos(&mCoord);
                         if (yes.isPressed(mCoord.x, mCoord.y)) {
                             return 0;

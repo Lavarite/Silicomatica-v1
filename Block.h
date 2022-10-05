@@ -40,7 +40,7 @@ public:
 
     void setType(string type) { this->type = type; };
 
-    void setSymbol(char symbol) { this->symbol = symbol; };
+    void setSymbol(string symbol) { this->symbol = symbol; };
 
     void setDrop(int drop) { this->drop = drop; };
 

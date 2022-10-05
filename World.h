@@ -42,36 +42,36 @@ public:
         return map;
     };
 
-    void setBlock(int x, int y, char b) {
+    void setBlock(int x, int y, string b) {
         Block block;
-        if (b == '-') {
+        if (b == "-") {
             block.setName("Air");
             block.setType("Block");
             block.setTool("None");
             block.setTransparent(true);
             block.setColor(2);
-        } else if (b == '|') {
+        } else if (b == "|") {
             block.setName("Wood");
             block.setType("Block");
             block.setTool("Axe");
             block.setTransparent(false);
             block.setColor(6);
             block.setDrop(1);
-        } else if (b == '#') {
+        } else if (b == "#") {
             block.setName("Stone");
             block.setType("Block");
             block.setTool("Pickaxe");
             block.setTransparent(false);
             block.setColor(8);
             block.setDrop(2);
-        } else if (b == '*') {
+        } else if (b == "*") {
             block.setName("Sand");
             block.setType("Block");
             block.setTool("Pickaxe");
             block.setTransparent(true);
             block.setColor(14);
             block.setDrop(3);
-        } else if (b == ',') {
+        } else if (b == ",") {
             block.setName("Water");
             block.setType("Block");
             block.setTool("None");
@@ -85,7 +85,7 @@ public:
     void setMap(vector<string> Map) {
         for (int i = 0; i < Map.size(); i++) {
             for (int j = 0; j < Map[i].length(); j++) {
-                setBlock(i, j, Map[i][j]);
+                setBlock(i, j, &Map[i][j]);
             }
         }
     };
@@ -171,15 +171,15 @@ public:
             for (int j = 0; j < size; ++j) {  // x
                 double n = pn.noise(((double) j / 10), ((double) i / 10), 0.8);
                 if (n < 0.2) {
-                    this->setBlock(i, j, ',');
+                    this->setBlock(i, j, ",");
                 } else if (n >= 0.2 && n < 0.3) {
-                    this->setBlock(i, j, '|');
+                    this->setBlock(i, j, "|");
                 } else if (n >= 0.3 && n < 0.37) {
-                    this->setBlock(i, j, '*');
+                    this->setBlock(i, j, "*");
                 } else if (n >= 0.37 && n < 0.68) {
-                    this->setBlock(i, j, '-');
+                    this->setBlock(i, j, "-");
                 } else {
-                    this->setBlock(i, j, '#');
+                    this->setBlock(i, j, "#");
                 }
             }
         }

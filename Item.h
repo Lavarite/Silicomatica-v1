@@ -39,7 +39,7 @@ namespace Material {
     Item PICKAXE{"Pickaxe", 1, "tool", "⛏", 7, 4};
     Item AXE{"Axe", 1, "tool", "⚒", 7, 5};
     Item WATER_SCAFFOLDING{"Water Scaffolding", 1, "block", "▢", 6, 6};
-    Item MECHANICAL_SIEVE{"Mechanical Sieve", 1, "mechanical_sieve", "▩", 6, 7};
+    Item MECHANICAL_SIEVE{"Mechanical Sieve", 1, "mechanical_sieve", "▣", 6, 7};
     Item MECHANICAL_CRUSHER{"Mechanical Crusher", 1, "mechanical_crusher", "§", 6, 8};
 
     Item get(int ITEM_ID) {
