@@ -34,7 +34,8 @@ public:
         }
     };
 
-    void removeItem(Item item) {
+    void removeItem(Item item, int quantity) {
+        item.quantity = quantity;
         for (int i = 0; i < size; i++) {
             if (items[i].getName() == item.getName()) {
                 items[i].setQuantity(items[i].getQuantity() - item.getQuantity());
@@ -43,6 +44,7 @@ public:
                     items[i].setName("");
                     items[i].setType("");
                     items[i].setSymbol("");
+                    items[i].id = 0;
                 }
                 return;
             }
@@ -50,7 +52,7 @@ public:
     };
 
     void moveItem(Item item, Inventory *i) {
-        this->removeItem(item);
+        this->removeItem(item, item.quantity);
         i->addItem(item);
     }
 };

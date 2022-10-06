@@ -13,6 +13,10 @@ public:
     int height;
     int width;
     string text;
+    string text1;
+    string text2;
+    int color = 7;
+    int itemColor = 7;
 
     string getText() { return text; };
 
@@ -27,6 +31,7 @@ public:
 
     void print() {
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), {static_cast<SHORT>(x + 1), static_cast<SHORT>(y)});
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
         for (int i = 0; i < width - 1; i++) {
             cout << "-";
         }
@@ -46,12 +51,42 @@ public:
         SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),
                                  {static_cast<SHORT>(x + 1),
                                   static_cast<SHORT>(y + height / 2)});
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
         for (int i = 0; i < width / 2 - text.length() / 2 - 1; i++) {
             cout << " ";
         }
         cout << text;
         for (int i = 0; i < width / 2 - text.length() / 2 - 1; i++) {
             cout << " ";
+        }
+        if (!text1.empty()) {
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),
+                                     {static_cast<SHORT>(x + 1),
+                                      static_cast<SHORT>(y + height / 2 + 1)});
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+            for (int i = 0; i < width / 2 - text1.length() / 2 - 1; i++) {
+                cout << " ";
+            }
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), itemColor);
+            cout << text1[0];
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+            cout << text1.substr(1);
+            for (int i = 0; i < width / 2 - text1.length() / 2 - 1; i++) {
+                cout << " ";
+            }
+        }
+        if (!text2.empty()) {
+            SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE),
+                                     {static_cast<SHORT>(x + 1),
+                                      static_cast<SHORT>(y + height / 2 - 1)});
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+            for (int i = 0; i < width / 2 - text2.length() / 2 - 1; i++) {
+                cout << " ";
+            }
+            cout << text2;
+            for (int i = 0; i < width / 2 - text2.length() / 2 - 1; i++) {
+                cout << " ";
+            }
         }
     }
 };

@@ -19,6 +19,7 @@ public:
     string tool = "";
     bool interactable = false;
     int drop = 0;
+    int id = 0;
 
     string getName() { return name; };
 
@@ -40,7 +41,7 @@ public:
 
     void setType(string type) { this->type = type; };
 
-    void setSymbol(char symbol) { this->symbol = symbol; };
+    void setSymbol(string symbol) { this->symbol = symbol; };
 
     void setDrop(int drop) { this->drop = drop; };
 
@@ -51,6 +52,8 @@ public:
     void setColor(int color) { this->color = color; };
 
     void setInteractable(bool b) { this->interactable = b; };
+
+    void interact();
 };
 
 
