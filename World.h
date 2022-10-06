@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "Block.h"
 #include "PerlinNoise.h"
+#include "Material.h"
 
 using namespace std;
 
@@ -45,40 +46,28 @@ public:
     void setBlock(int x, int y, string b) {
         Block block;
         if (b == "-") {
-            block.setName("Air");
-            block.setType("Block");
-            block.setTool("None");
-            block.setTransparent(true);
-            block.setColor(2);
+            block = Material::Blocks::AIR;
         } else if (b == "|") {
-            block.setName("Wood");
-            block.setType("Block");
-            block.setTool("Axe");
-            block.setTransparent(false);
-            block.setColor(6);
-            block.setDrop(1);
+            block = Material::Blocks::WOOD;
         } else if (b == "#") {
-            block.setName("Stone");
-            block.setType("Block");
-            block.setTool("Pickaxe");
-            block.setTransparent(false);
-            block.setColor(8);
-            block.setDrop(2);
+            block = Material::Blocks::STONE;
         } else if (b == "*") {
-            block.setName("Sand");
-            block.setType("Block");
-            block.setTool("Pickaxe");
-            block.setTransparent(true);
-            block.setColor(14);
-            block.setDrop(3);
+            block = Material::Blocks::SAND;
         } else if (b == ",") {
-            block.setName("Water");
-            block.setType("Block");
-            block.setTool("None");
-            block.setTransparent(true);
-            block.setColor(9);
+            block = Material::Blocks::WATER;
+        } else if (b == "%") {
+            block = Material::Blocks::WORKBENCH;
+        } else if (b == "▢") {
+            block = Material::Blocks::WATER_SCAFFOLDING;
+        } else if (b == "▣") {
+            block = Material::Blocks::MECHANICAL_SIEVE;
+        } else if (b == "₪") {
+            block = Material::Blocks::MECHANICAL_CRUSHER;
         }
-        block.setSymbol(b);
+        map[x][y] = block;
+    };
+
+    void setBlock(int x, int y, Block block) {
         map[x][y] = block;
     };
 
@@ -250,7 +239,7 @@ public:
                     stringstream ss(line);
                     int id, quantity;
                     ss >> id >> quantity;
-                    player.inventory.items[itemsN] = Material::get(id);
+                    player.inventory.items[itemsN] = Material::Items::get(id);
                     player.inventory.items[itemsN].quantity = quantity;
                 }
                 players.push_back(player);
