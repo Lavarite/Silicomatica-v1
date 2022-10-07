@@ -13,6 +13,7 @@
 #define LMB controller.irInBuf[0].Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED
 #define RMB controller.irInBuf[0].Event.MouseEvent.dwButtonState == RIGHTMOST_BUTTON_PRESSED
 #define KEY_DOWN controller.irInBuf[0].Event.KeyEvent.wVirtualKeyCode
+#define KEY_EXACT controller.irInBuf[0].Event.KeyEvent.uChar.AsciiChar
 
 static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 static const HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
@@ -160,15 +161,14 @@ void gameLoop(Player &player, World &world) {
         SetConsoleCursorPosition(hOut, {0, 0});
         world.updatePlayer(player);
         world.printMap(player);
-        clearKeyboardBuffer();
+
     }
 }
 
-#pragma clang diagnostic pop
 
 void loadWorld() {
     system("cls");
-    string path = "../saves";
+    string path = "saves";
     vector<Button> worlds;
     Button returnToMenu;
     returnToMenu.width = 40;
@@ -183,18 +183,18 @@ void loadWorld() {
     }
     while (true) {
         SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
-        clearKeyboardBuffer();
+
         for (int i = 0; i < worlds.size(); i++) {
             worlds[i].print();
         }
         returnToMenu.print();
         if (LMB) {
-            clearKeyboardBuffer();
+
             GetMouseCursorPos(&mCoord);
             for (int i = 0; i < worlds.size(); i++) {
                 if (worlds[i].isPressed(mCoord.x, mCoord.y)) {
                     World world;
-                    string dir = "../saves/" + worlds[i].text + ".txt";
+                    string dir = "saves/" + worlds[i].text + ".txt";
                     world.loadFile(dir);
                     Player player;
                     system("cls");
@@ -209,37 +209,8 @@ void loadWorld() {
                         ign.print();
                         color.print();
                         load.print();
-                        if (ignBool) {
-                            int c = _getch();
-                            if (c != 0) {
-                                if (c == 13) {
-                                    ignBool = false;
-                                } else if (c == 8) {
-                                    if (player.name.size() > 0) {
-                                        player.name.pop_back();
-                                    }
-                                } else {
-                                    if (player.name.size() < 31) player.name = player.name + (char) c;
-                                }
-                            }
-                            clearKeyboardBuffer();
-                        }
-                        if (colorBool) {
-                            int c = _getch();
-                            if (c != 0) {
-                                if (c == 13) {
-                                    colorBool = false;
-                                } else if (c == 8) {
-                                    player.color = player.color / 10;
-                                } else if (c >= 48 && c <= 57) {
-                                    if (player.color * 10 + (c - 48) >= 32) player.color = 32;
-                                    else player.color = player.color * 10 + (c - 48);
-                                }
-                            }
-                            clearKeyboardBuffer();
-                        }
                         if (LMB) {
-                            clearKeyboardBuffer();
+
                             GetMouseCursorPos(&mCoord);
                             if (ign.isPressed(mCoord.x, mCoord.y)) {
                                 ignBool = true;
@@ -254,6 +225,36 @@ void loadWorld() {
                                 break;
                             }
                         }
+                        if (ignBool) {
+                            if (GetAsyncKeyState(KEY_DOWN) < 0)KEY_DOWN = 0;
+                            if (KEY_DOWN) {
+                                if (KEY_DOWN == 13) {
+                                    ignBool = false;
+                                } else if (KEY_DOWN == 8) {
+                                    if (!player.name.empty()) {
+                                        player.name.pop_back();
+                                    }
+                                } else {
+                                    if (player.name.size() < 31) player.name = player.name + (char) KEY_EXACT;
+                                }
+                            }
+                            KEY_DOWN = 0;
+                        }
+                        if (colorBool) {
+                            if (GetAsyncKeyState(KEY_DOWN) < 0)KEY_DOWN = 0;
+                            if (KEY_DOWN) {
+                                if (KEY_DOWN == 13) {
+                                    colorBool = false;
+                                } else if (KEY_DOWN == 8) {
+                                    player.color = player.color / 10;
+                                } else if (KEY_DOWN >= 48 && KEY_DOWN <= 57) {
+                                    if (player.color * 10 + (KEY_DOWN - 48) >= 32) player.color = 32;
+                                    else player.color = player.color * 10 + (KEY_DOWN - 48);
+                                }
+                            }
+                            KEY_DOWN = 0;
+                        }
+
                     }
                     if (player.name.empty()) player.name = "Player";
                     if (world.findPlayer(player.name) != -1) {
@@ -276,7 +277,7 @@ void loadWorld() {
 }
 
 void createWorld() {
-    clearKeyboardBuffer();
+
     bool Name = false;
     bool Seed = false;
     bool Size = false;
@@ -290,7 +291,7 @@ void createWorld() {
     Button create{50, 40, 5, 40, "Next"};
     while (true) {
         SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
-        clearKeyboardBuffer();
+
         name.text = "Name: " + world.name;
         size.text = "Size: " + to_string(world.size) + "x" + to_string(world.size);
         seed.text = "Seed: " + to_string(world.seed);
@@ -299,52 +300,8 @@ void createWorld() {
         seed.print();
         returnToMenu.print();
         create.print();
-        if (Name) {
-            int c = _getch();
-            if (c != 0) {
-                if (c == 13) {
-                    Name = false;
-                } else if (c == 8) {
-                    if (world.name.size() > 0) {
-                        world.name.pop_back();
-                    }
-                } else {
-                    if (world.name.size() < 31) world.name = world.name + (char) c;
-                }
-            }
-            clearKeyboardBuffer();
-        }
-        if (Size) {
-            int c = _getch();
-            if (c != 0) {
-                if (c == 13) {
-                    Size = false;
-                } else if (c == 8) {
-                    world.size = world.size / 10;
-                } else if (c >= 48 && c <= 57) {
-                    if (world.size * 10 + (c - 48) >= 200) world.size = 200;
-                    else world.size = world.size * 10 + (c - 48);
-                }
-            }
-            clearKeyboardBuffer();
-        }
-        if (Seed) {
-            int c = _getch();
-            if (c != 0) {
-                if (c == 13) {
-                    Seed = false;
-                } else if (c == 8) {
-                    world.seed = world.seed / 10;
-                } else if (c >= 48 && c <= 57) {
-                    if (world.seed * 10 + c - 48 > 32767) {
-                        world.seed = 32767;
-                    } else world.seed = world.seed * 10 + c - 48;
-                }
-            }
-            clearKeyboardBuffer();
-        }
         if (LMB) {
-            clearKeyboardBuffer();
+
             GetMouseCursorPos(&mCoord);
             if (returnToMenu.isPressed(mCoord.x, mCoord.y)) {
                 system("cls");
@@ -378,37 +335,7 @@ void createWorld() {
                     ign.print();
                     color.print();
                     create.print();
-                    if (ignBool) {
-                        int c = _getch();
-                        if (c != 0) {
-                            if (c == 13) {
-                                ignBool = false;
-                            } else if (c == 8) {
-                                if (player.name.size() > 0) {
-                                    player.name.pop_back();
-                                }
-                            } else {
-                                if (player.name.size() < 31) player.name = player.name + (char) c;
-                            }
-                        }
-                        clearKeyboardBuffer();
-                    }
-                    if (colorBool) {
-                        int c = _getch();
-                        if (c != 0) {
-                            if (c == 13) {
-                                colorBool = false;
-                            } else if (c == 8) {
-                                player.color = player.color / 10;
-                            } else if (c >= 48 && c <= 57) {
-                                if (player.color * 10 + (c - 48) >= 32) player.color = 32;
-                                else player.color = player.color * 10 + (c - 48);
-                            }
-                        }
-                        clearKeyboardBuffer();
-                    }
                     if (LMB) {
-                        clearKeyboardBuffer();
                         GetMouseCursorPos(&mCoord);
                         if (ign.isPressed(mCoord.x, mCoord.y)) {
                             ignBool = true;
@@ -423,6 +350,38 @@ void createWorld() {
                             break;
                         }
                     }
+                    if (ignBool) {
+                        if (GetAsyncKeyState(KEY_DOWN) < 0)KEY_DOWN = 0;
+                        if (KEY_DOWN) {
+                            if (KEY_DOWN == 13) {
+                                ignBool = false;
+                            } else if (KEY_DOWN == 8) {
+                                if (!player.name.empty()) {
+                                    player.name.pop_back();
+                                }
+                            } else {
+                                if (player.name.size() < 31) player.name = player.name + (char) KEY_EXACT;
+                            }
+                        }
+                        KEY_DOWN = 0;
+
+                    }
+                    if (colorBool) {
+                        if (GetAsyncKeyState(KEY_DOWN) < 0)KEY_DOWN = 0;
+                        if (KEY_DOWN) {
+                            if (KEY_DOWN == 13) {
+                                colorBool = false;
+                            } else if (KEY_DOWN == 8) {
+                                player.color = player.color / 10;
+                            } else if (KEY_DOWN >= 48 && KEY_DOWN <= 57) {
+                                if (player.color * 10 + (KEY_DOWN - 48) >= 32) player.color = 32;
+                                else player.color = player.color * 10 + (KEY_DOWN - 48);
+                            }
+                        }
+                        KEY_DOWN = 0;
+
+                    }
+
                 }
                 if (world.name.empty()) world.name = "World";
                 if (player.name.empty()) player.name = "Player";
@@ -432,10 +391,58 @@ void createWorld() {
                 break;
             }
         }
+        if (Name) {
+            if (GetAsyncKeyState(KEY_DOWN) < 0)KEY_DOWN = 0;
+            if (KEY_DOWN) {
+                if (KEY_DOWN == 13) {
+                    Name = false;
+                } else if (KEY_DOWN == 8) {
+                    if (!world.name.empty()) {
+                        world.name.pop_back();
+                    }
+                } else {
+                    if (world.name.size() < 31) world.name = world.name + (char) KEY_EXACT;
+                }
+            }
+            KEY_DOWN = 0;
+
+        }
+        if (Size) {
+            if (GetAsyncKeyState(KEY_DOWN) < 0)KEY_DOWN = 0;
+            if (KEY_DOWN) {
+                if (KEY_DOWN == 13) {
+                    Size = false;
+                } else if (KEY_DOWN == 8) {
+                    world.size = world.size / 10;
+                } else if (KEY_DOWN >= 48 && KEY_DOWN <= 57) {
+                    if (world.size * 10 + (KEY_DOWN - 48) >= 200) world.size = 200;
+                    else world.size = world.size * 10 + (KEY_DOWN - 48);
+                }
+            }
+            KEY_DOWN = 0;
+
+        }
+        if (Seed) {
+            if (GetAsyncKeyState(KEY_DOWN) < 0)KEY_DOWN = 0;
+            if (KEY_DOWN) {
+                if (KEY_DOWN == 13) {
+                    Seed = false;
+                } else if (KEY_DOWN == 8) {
+                    world.seed = world.seed / 10;
+                } else if (KEY_DOWN >= 48 && KEY_DOWN <= 57) {
+                    if (world.seed * 10 + KEY_DOWN - 48 > 32767) {
+                        world.seed = 32767;
+                    } else world.seed = world.seed * 10 + KEY_DOWN - 48;
+                }
+            }
+            KEY_DOWN = 0;
+        }
+
     }
 }
 
 int main() {
+    filesystem::create_directory("saves");
     font.cbSize = sizeof(CONSOLE_FONT_INFOEX);
     GetCurrentConsoleFontEx(hOut, 0, &font);
     font.FontWeight = 700;
@@ -457,7 +464,7 @@ int main() {
     Button settings{10, 30, 5, 20, "Settings"}, exit{10, 40, 5, 20, "Exit"};
     while (true) {
         SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
-        clearKeyboardBuffer();
+
         newWorld.print();
         load.print();
         settings.print();
@@ -471,7 +478,7 @@ int main() {
                 yes.print();
                 no.print();
                 areyousure.print();
-                clearKeyboardBuffer();
+
                 while (true) {
                     SetConsoleMode(hIn, ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
                     if (LMB) {

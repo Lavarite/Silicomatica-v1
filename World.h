@@ -176,7 +176,7 @@ public:
 
     void saveFile() {
         fstream file;
-        file.open("../saves/" + name + ".txt", ios::out);
+        file.open("saves/" + name + ".txt", ios::out);
         if (file.is_open()) {
             file << name << " " << seed << " " << size << endl;
             file << endl;
