@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <conio.h>
 #include <fstream>
+#include <memory>
 #include "Inventory.h"
 #include "Player.h"
 #include "World.h"
@@ -42,8 +43,6 @@ void GetMouseCursorPos(POINT *mC) {
     }
 }
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "ArgumentSelectionDefects"
 
 void gameLoop(Player &player, World &world) {
     POINT mapCoord;
@@ -83,8 +82,8 @@ void gameLoop(Player &player, World &world) {
                     mapCoord.y + player.y >= 0) {
                     mapCoord.x += player.x;
                     mapCoord.y += player.y;
-                    if (world.map[mapCoord.y][mapCoord.x].type != "Gas") {
-                        player.inventory.addItem(Material::Items::get(world.map[mapCoord.y][mapCoord.x].drop));
+                    if (world.map[mapCoord.y][mapCoord.x]->type != "Gas") {
+                        player.inventory.addItem(Material::Items::get(world.map[mapCoord.y][mapCoord.x]->drop));
                         world.setBlock(mapCoord.y, mapCoord.x, Material::Blocks::AIR);
                     }
                 }
@@ -100,9 +99,22 @@ void gameLoop(Player &player, World &world) {
                     mapCoord.y + player.y >= 0) {
                     mapCoord.x += player.x;
                     mapCoord.y += player.y;
-                    if (world.map[mapCoord.y][mapCoord.x].isTransparent() &&
-                        player.inventory.items[player.selectedSlot].type == "block") {
-                        world.setBlock(mapCoord.y, mapCoord.x, player.inventory.items[player.selectedSlot].symbol);
+                    if (world.map[mapCoord.y][mapCoord.x]->interactable) {
+                        if (GetAsyncKeyState(VK_SHIFT)) {
+                            if (world.map[mapCoord.y][mapCoord.x]->isTransparent() &&
+                                player.inventory.items[player.selectedSlot].type == "block") {
+                                world.setBlock(mapCoord.y, mapCoord.x,
+                                               player.inventory.items[player.selectedSlot].symbol);
+                                player.inventory.removeItem(player.inventory.items[player.selectedSlot], 1);
+                            }
+                        } else {
+                            world.map[mapCoord.y][mapCoord.x]->interact();
+                        }
+                    } else if (world.map[mapCoord.y][mapCoord.x]->isTransparent() &&
+                               player.inventory.items[player.selectedSlot].type == "block") {
+
+                        world.setBlock(mapCoord.y, mapCoord.x,
+                                       player.inventory.items[player.selectedSlot].symbol);
                         player.inventory.removeItem(player.inventory.items[player.selectedSlot], 1);
                     }
                 }
@@ -442,6 +454,7 @@ void createWorld() {
 }
 
 int main() {
+    Material::init();
     filesystem::create_directory("saves");
     font.cbSize = sizeof(CONSOLE_FONT_INFOEX);
     GetCurrentConsoleFontEx(hOut, 0, &font);

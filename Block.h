@@ -11,6 +11,8 @@ using namespace std;
 
 class Block {
 public:
+
+
     string name = "";
     string type = "";
     int color = 7;
@@ -20,6 +22,21 @@ public:
     bool interactable = false;
     int drop = 0;
     int id = 0;
+
+    void create(string name, string type, int color, bool transparent, string symbol, string tool, bool interactable,
+                int drop, int id) {
+        this->name = name;
+        this->type = type;
+        this->color = color;
+        this->transparent = transparent;
+        this->symbol = symbol;
+        this->tool = tool;
+        this->interactable = interactable;
+        this->drop = drop;
+        this->id = id;
+    };
+
+    virtual void interact() {};
 
     string getName() { return name; };
 
@@ -53,7 +70,6 @@ public:
 
     void setInteractable(bool b) { this->interactable = b; };
 
-    void interact();
 };
 
 
