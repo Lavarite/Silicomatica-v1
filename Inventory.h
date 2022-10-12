@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "Item.h"
+#include "Material.h"
 
 using namespace std;
 
@@ -40,11 +41,7 @@ public:
             if (items[i].getName() == item.getName()) {
                 items[i].setQuantity(items[i].getQuantity() - item.getQuantity());
                 if (items[i].getQuantity() <= 0) {
-                    items[i].setQuantity(0);
-                    items[i].setName("");
-                    items[i].setType("");
-                    items[i].setSymbol("");
-                    items[i].id = 0;
+                    items[i] = Material::Items::Null;
                 }
                 return;
             }

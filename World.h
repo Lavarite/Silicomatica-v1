@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wc++11-narrowing"
 #ifndef TOO_HOT_OUTSIDE_FOR_A_BIT_TOO_LONG_WORLD_H
 #define TOO_HOT_OUTSIDE_FOR_A_BIT_TOO_LONG_WORLD_H
 
@@ -7,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <memory>
 #include "Player.h"
 #include "Block.h"
 #include "PerlinNoise.h"
@@ -32,43 +31,47 @@ public:
 
 
     vector<Player> players;
-    vector<vector<Block>> map;
+    vector<vector<unique_ptr<Block>>> map;
 
 
     Block getBlock(int x, int y) {
-        return map[x][y];
+        return *map[x][y];
     };
 
     vector<vector<Block>> getMap() {
-        return map;
+        vector<vector<Block>> map2 = vector<vector<Block>>(size, vector<Block>(size));
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                map2[i][j] = *map[i][j];
+            }
+        }
+        return map2;
     };
 
     void setBlock(int x, int y, string b) {
-        Block block;
         if (b == "-") {
-            block = Material::Blocks::AIR;
+            map[x][y] = make_unique<Block>(Material::Blocks::AIR);
         } else if (b == "|") {
-            block = Material::Blocks::WOOD;
+            map[x][y] = make_unique<Block>(Material::Blocks::WOOD);
         } else if (b == "#") {
-            block = Material::Blocks::STONE;
+            map[x][y] = make_unique<Block>(Material::Blocks::STONE);
         } else if (b == "*") {
-            block = Material::Blocks::SAND;
+            map[x][y] = make_unique<Block>(Material::Blocks::SAND);
         } else if (b == ",") {
-            block = Material::Blocks::WATER;
+            map[x][y] = make_unique<Block>(Material::Blocks::WATER);
         } else if (b == "%") {
-            block = Material::Blocks::WORKBENCH;
+            map[x][y] = make_unique<Block>(Material::Blocks::WORKBENCH);
         } else if (b == "▢") {
-            block = Material::Blocks::WATER_SCAFFOLDING;
+            map[x][y] = make_unique<Block>(Material::Blocks::WATER_SCAFFOLDING);
         } else if (b == "▣") {
-            block = Material::Blocks::MECHANICAL_SIEVE;
+            map[x][y] = make_unique<Block>(Material::Blocks::MECHANICAL_SIEVE);
         } else if (b == "₪") {
-            block = Material::Blocks::MECHANICAL_CRUSHER;
+            map[x][y] = make_unique<Block>(Material::Blocks::MECHANICAL_CRUSHER);
         }
-        map[x][y] = block;
     };
 
     void setBlock(int x, int y, Block block) {
-        map[x][y] = block;
+        map[x][y] = make_unique<Block>(block);
     };
 
     void setMap(vector<string> Map) {
@@ -142,8 +145,8 @@ public:
                         }
                     }
                     if (!isP) {
-                        SetConsoleTextAttribute(hOut, map[i][j].getColor());
-                        cout << map[i][j].getSymbol();
+                        SetConsoleTextAttribute(hOut, map[i][j]->getColor());
+                        cout << map[i][j]->getSymbol();
                         SetConsoleTextAttribute(hOut, 7);
                         cout << " ";
                     }
@@ -154,7 +157,10 @@ public:
     }
 
     void generate(unsigned int Seed) {
-        map = vector<vector<Block>>(size, vector<Block>(size));
+        map.resize(size);
+        for (auto &a: map) {
+            a.resize(size);
+        }
         PerlinNoise pn(Seed);
         for (int i = 0; i < size; ++i) {     // y
             for (int j = 0; j < size; ++j) {  // x
@@ -183,14 +189,13 @@ public:
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
                     file << i << " " << j << " ";
-                    file << map[i][j].type << " ";
-                    file << map[i][j].name << " ";
-                    file << map[i][j].color << " ";
-                    file << map[i][j].transparent << " ";
-                    file << map[i][j].symbol << " ";
-                    file << map[i][j].tool << " ";
-                    file << map[i][j].interactable << " ";
-                    file << map[i][j].drop << endl;
+                    file << map[i][j]->type << " " << map[i][j]->id;
+                    if (map[i][j]->type == "Block") {
+                    } else if (map[i][j]->type == "Workbench") {
+                    } else if (map[i][j]->type == "MechanicalSieve") {
+                    } else if (map[i][j]->type == "MechanicalCrusher") {
+                    }
+                    file << endl;
                 }
             }
             file << players.size() << endl;
@@ -215,16 +220,23 @@ public:
             stringstream s(line);
             s >> name >> seed >> size;
             getline(file, line);
-            map = vector<vector<Block>>(size, vector<Block>(size));
+            map.resize(size);
+            for (auto &a: map) {
+                a.resize(size);
+            }
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
                     getline(file, line);
                     stringstream ss(line);
-                    Block block;
-                    int x, y;
-                    ss >> x >> y >> block.type >> block.name >> block.color >> block.transparent >> block.symbol
-                       >> block.tool >> block.interactable >> block.drop;
-                    map[x][y] = block;
+                    string type;
+                    int x, y, id;
+                    ss >> x >> y >> type >> id;
+                    if (type == "Block") {
+                    } else if (type == "Workbench") {
+                    } else if (type == "MechanicalSieve") {
+                    } else if (type == "MechanicalCrusher") {
+                    }
+                    map[x][y] = Material::Blocks::get(id);
                 }
             }
             getline(file, line);
