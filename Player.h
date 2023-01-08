@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 #include "Inventory.h"
-#include "Block.h"
 #include "Button.h"
+#include "Block.h"
 
 class Player {
 public:

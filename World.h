@@ -70,8 +70,8 @@ public:
         }
     };
 
-    void setBlock(int x, int y, Block block) {
-        map[x][y] = make_unique<Block>(block);
+    void setBlock(int x, int y, int block) {
+        map[x][y] = Material::Blocks::get(block);
     };
 
     void setMap(vector<string> Map) {
@@ -132,10 +132,10 @@ public:
                 if (i < 0 || j < 0 || i >= size || j >= size) {
                     cout << "  ";
                 } else {
-                    for (int k = 0; k < players.size(); k++) {
-                        if (players[k].getX() == j && players[k].getY() == i) {
+                    for (auto &k: players) {
+                        if (k.getX() == j && k.getY() == i) {
                             SetConsoleTextAttribute(hOut, player.getColor());
-                            cout << players[k].getSymbol();
+                            cout << k.getSymbol();
                             SetConsoleTextAttribute(hOut, 7);
                             cout << " ";
                             isP = true;
@@ -157,6 +157,7 @@ public:
     }
 
     void generate(unsigned int Seed) {
+        map.clear();
         map.resize(size);
         for (auto &a: map) {
             a.resize(size);
@@ -188,24 +189,29 @@ public:
             file << endl;
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
-                    file << i << " " << j << " ";
-                    file << map[i][j]->type << " " << map[i][j]->id;
-                    if (map[i][j]->type == "Block") {
-                    } else if (map[i][j]->type == "Workbench") {
-                    } else if (map[i][j]->type == "MechanicalSieve") {
-                    } else if (map[i][j]->type == "MechanicalCrusher") {
+                    file << i << " " << j << " " << map[i][j]->id << " " << map[i][j]->in.size() << " "
+                         << map[i][j]->out.size();
+                    if (!map[i][j]->in.empty()) {
+                        for (auto &a: map[i][j]->in) {
+                            file << " " << a.id << " " << a.quantity;
+                        }
+                    }
+                    if (!map[i][j]->out.empty()) {
+                        for (auto &a: map[i][j]->out) {
+                            file << " " << a.id << " " << a.quantity;
+                        }
                     }
                     file << endl;
                 }
             }
             file << players.size() << endl;
-            for (int playerN = 0; playerN < players.size(); playerN++) {
-                file << players[playerN].name << " " << players[playerN].x << " " << players[playerN].y << " "
-                     << players[playerN].color << " "
-                     << players[playerN].symbol << " " << players[playerN].selectedSlot << " " << endl;
+            for (auto &player: players) {
+                file << player.name << " " << player.x << " " << player.y << " "
+                     << player.color << " "
+                     << player.symbol << " " << player.selectedSlot << " " << endl;
                 for (int itemsN = 0; itemsN < 9; itemsN++) {
-                    file << players[playerN].inventory.items[itemsN].id << " "
-                         << players[playerN].inventory.items[itemsN].quantity << endl;
+                    file << player.inventory.items[itemsN].id << " "
+                         << player.inventory.items[itemsN].quantity << endl;
                 }
             }
         }
@@ -229,14 +235,32 @@ public:
                     getline(file, line);
                     stringstream ss(line);
                     string type;
-                    int x, y, id;
-                    ss >> x >> y >> type >> id;
-                    if (type == "Block") {
-                    } else if (type == "Workbench") {
-                    } else if (type == "MechanicalSieve") {
-                    } else if (type == "MechanicalCrusher") {
+                    int x, y, id, inS, outS, iId, amount;
+                    vector<Item> in, out;
+                    ss >> x >> y >> id >> inS >> outS;
+                    setBlock(x, y, id);
+                    if (inS > 0) {
+                        in.resize(inS);
+                        Item o;
+                        for (int k = 0; k < inS; k++) {
+                            ss >> iId >> amount;
+                            o = Material::Items::get(iId);
+                            o.quantity = amount;
+                            in.emplace_back(o);
+                        }
+                        map[x][y]->in = in;
                     }
-                    map[x][y] = Material::Blocks::get(id);
+                    if (outS > 0) {
+                        out.resize(outS);
+                        Item o;
+                        for (int k = 0; k < outS; k++) {
+                            ss >> iId >> amount;
+                            o = Material::Items::get(iId);
+                            o.quantity = amount;
+                            out.emplace_back(o);
+                        }
+                        map[x][y]->out = out;
+                    }
                 }
             }
             getline(file, line);

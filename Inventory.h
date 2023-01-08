@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include "Item.h"
-#include "Material.h"
 
 using namespace std;
 
@@ -35,13 +34,29 @@ public:
         }
     };
 
+    void addItem(Item item, int quantity) {
+        for (int i = 0; i < size; i++) {
+            if (items[i].getName() == item.getName()) {
+                items[i].setQuantity(items[i].getQuantity() + quantity);
+                return;
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            if (items[i].getQuantity() == 0) {
+                items[i] = item;
+                items[i].setQuantity(quantity);
+                return;
+            }
+        }
+    };
+
     void removeItem(Item item, int quantity) {
         item.quantity = quantity;
         for (int i = 0; i < size; i++) {
             if (items[i].getName() == item.getName()) {
                 items[i].setQuantity(items[i].getQuantity() - item.getQuantity());
                 if (items[i].getQuantity() <= 0) {
-                    items[i] = Material::Items::Null;
+                    items[i] = Item{"", 0, "", "", 7, 0};
                 }
                 return;
             }
