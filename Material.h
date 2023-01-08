@@ -66,41 +66,41 @@ namespace Material::Blocks {
     MechanicalCrusher MECHANICAL_CRUSHER;
 
     void init() {
-        Null.create("", "", 0, true, "", "", false, 0, 0);
-        AIR.create("Air", "Gas", 2, true, "-", "None", false, 1, 1);
-        WOOD.create("Wood", "Block", 6, false, "|", "Axe", false, 1, 2);
-        STONE.create("Stone", "Block", 8, false, "#", "Pickaxe", false, 2, 3);
-        SAND.create("Sand", "Block", 14, true, "*", "Pickaxe", false, 3, 4);
-        WATER.create("Water", "Liquid", 9, true, ",", "Bucket", false, 0, 5);
-        WORKBENCH.create("Workbench", "Block", 6, false, "%", "Axe", true, 4, 6);
-        WATER_SCAFFOLDING.create("WaterScaffolding", "Block", 6, true, "▢", "Axe", false, 7, 7);
-        MECHANICAL_SIEVE.create("MechanicalSieve", "Block", 6, false, "▣", "Pickaxe", true, 8, 8);
-        MECHANICAL_CRUSHER.create("MechanicalCrusher", "Block", 6, false, "₪", "Pickaxe", true, 9, 9);
+        Null.create("", "", 0, true, "", "", false, 0, 0, {}, {});
+        AIR.create("Air", "Gas", 2, true, "-", "None", false, 1, 1, {}, {});
+        WOOD.create("Wood", "Block", 6, false, "|", "Axe", false, 1, 2, {}, {});
+        STONE.create("Stone", "Block", 8, false, "#", "Pickaxe", false, 2, 3, {}, {});
+        SAND.create("Sand", "Block", 14, true, "*", "Pickaxe", false, 3, 4, {}, {});
+        WATER.create("Water", "Liquid", 9, true, ",", "Bucket", false, 0, 5, {}, {});
+        WORKBENCH.create("Workbench", "Block", 6, false, "%", "Axe", true, 4, 6, {}, {});
+        WATER_SCAFFOLDING.create("WaterScaffolding", "Block", 6, true, "▢", "Axe", false, 7, 7, {}, {});
+        MECHANICAL_SIEVE.create("MechanicalSieve", "Block", 6, false, "▣", "Pickaxe", true, 8, 8, {}, {});
+        MECHANICAL_CRUSHER.create("MechanicalCrusher", "Block", 6, false, "₪", "Pickaxe", true, 9, 9, {}, {});
     }
 
     unique_ptr<Block> get(int ITEM_ID) {
 
         switch (ITEM_ID) {
             case 1:
-                return unique_ptr<Block>(&AIR);
+                return make_unique<Block>(AIR);
             case 2:
-                return unique_ptr<Block>(&WOOD);
+                return make_unique<Block>(WOOD);
             case 3:
-                return unique_ptr<Block>(&STONE);
+                return make_unique<Block>(STONE);
             case 4:
-                return unique_ptr<Block>(&SAND);
+                return make_unique<Block>(SAND);
             case 5:
-                return unique_ptr<Block>(&WATER);
+                return make_unique<Block>(WATER);
             case 6:
-                return unique_ptr<Workbench>(&WORKBENCH);
+                return make_unique<Workbench>(WORKBENCH);
             case 7:
-                return unique_ptr<Block>(&WATER_SCAFFOLDING);
+                return make_unique<Block>(WATER_SCAFFOLDING);
             case 8:
-                return unique_ptr<MechanicalSieve>(&MECHANICAL_SIEVE);
+                return make_unique<MechanicalSieve>(MECHANICAL_SIEVE);
             case 9:
-                return unique_ptr<MechanicalCrusher>(&MECHANICAL_CRUSHER);
+                return make_unique<MechanicalCrusher>(MECHANICAL_CRUSHER);
             default:
-                return unique_ptr<Block>(&Null);
+                return make_unique<Block>(Null);
         }
     }
 }
@@ -108,7 +108,6 @@ namespace Material::Blocks {
 namespace Material {
     void init() {
         Material::Blocks::init();
-        Material::CraftingRecipies::init();
     }
 }
 #endif //TOO_HOT_OUTSIDE_FOR_A_BIT_TOO_LONG_MATERIAL_H

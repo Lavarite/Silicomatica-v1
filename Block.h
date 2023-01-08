@@ -6,6 +6,8 @@
 #include <vector>
 #include <list>
 #include "Item.h"
+#include "Controller.h"
+#include <unordered_map>
 
 using namespace std;
 
@@ -24,7 +26,7 @@ public:
     int id = 0;
 
     void create(string name, string type, int color, bool transparent, string symbol, string tool, bool interactable,
-                int drop, int id) {
+                int drop, int id, vector<Item> in, vector<Item> out) {
         this->name = name;
         this->type = type;
         this->color = color;
@@ -34,9 +36,11 @@ public:
         this->interactable = interactable;
         this->drop = drop;
         this->id = id;
+        this->in = in;
+        this->out = out;
     };
 
-    virtual void interact() {};
+    virtual void interact(Inventory *inventory, int *selectedSlot, Controller *controller) {};
 
     string getName() { return name; };
 
@@ -69,6 +73,9 @@ public:
     void setColor(int color) { this->color = color; };
 
     void setInteractable(bool b) { this->interactable = b; };
+
+    vector<Item> in;
+    vector<Item> out;
 
 };
 

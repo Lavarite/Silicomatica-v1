@@ -21,6 +21,7 @@ static const HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
 static CONSOLE_FONT_INFOEX font;
 Controller controller;
 POINT mCoord;
+World world;
 
 void clearKeyboardBuffer() {
     while (_kbhit()) {
@@ -36,11 +37,8 @@ void set_cursor(bool visible) {
 }
 
 void GetMouseCursorPos(POINT *mC) {
-    if (controller.irInBuf[0].EventType == MOUSE_EVENT) {
-        mC->x = controller.irInBuf[0].Event.MouseEvent.dwMousePosition.X;
-        mC->y = controller.irInBuf[0].Event.MouseEvent.dwMousePosition.Y;
-        return;
-    }
+    mC->x = controller.irInBuf[0].Event.MouseEvent.dwMousePosition.X;
+    mC->y = controller.irInBuf[0].Event.MouseEvent.dwMousePosition.Y;
 }
 
 
@@ -84,13 +82,14 @@ void gameLoop(Player &player, World &world) {
                     mapCoord.y += player.y;
                     if (world.map[mapCoord.y][mapCoord.x]->type != "Gas") {
                         player.inventory.addItem(Material::Items::get(world.map[mapCoord.y][mapCoord.x]->drop));
-                        world.setBlock(mapCoord.y, mapCoord.x, Material::Blocks::AIR);
+                        world.setBlock(mapCoord.y, mapCoord.x, 1);
                     }
                 }
             }
         }
         if (RMB) {
             GetMouseCursorPos(&mCoord);
+            RemoveMenu(GetSystemMenu(GetConsoleWindow(), TRUE), SC_CLOSE, MF_BYCOMMAND);
             if (mCoord.x < 61 && mCoord.y > 0 && mCoord.y < 32) {
                 mapCoord.x = mCoord.x / 2 + mCoord.x % 2 - 15;
                 mapCoord.y = mCoord.y - 16;
@@ -108,7 +107,8 @@ void gameLoop(Player &player, World &world) {
                                 player.inventory.removeItem(player.inventory.items[player.selectedSlot], 1);
                             }
                         } else {
-                            world.map[mapCoord.y][mapCoord.x]->interact();
+                            world.map[mapCoord.y][mapCoord.x]->interact(&player.inventory, &player.selectedSlot,
+                                                                        &controller);
                         }
                     } else if (world.map[mapCoord.y][mapCoord.x]->isTransparent() &&
                                player.inventory.items[player.selectedSlot].type == "block") {
@@ -120,28 +120,27 @@ void gameLoop(Player &player, World &world) {
                 }
             }
         }
-        switch (KEY_DOWN) {
-            case VK_ESCAPE:
-                system("cls");
-                while (true) {
-                    back.print();
-                    settings.print();
-                    exit.print();
-                    if (LMB) {
-                        GetMouseCursorPos(&mCoord);
-                        if (back.isPressed(mCoord.x, mCoord.y)) {
-                            system("cls");
-                            break;
-                        }
-                        if (exit.isPressed(mCoord.x, mCoord.y)) {
-                            system("cls");
-                            world.saveFile();
-                            return;
-                        }
+        if (GetAsyncKeyState(KEY_DOWN) < 0)KEY_DOWN = 0;
+        if (KEY_DOWN == VK_ESCAPE) {
+            back.print();
+            settings.print();
+            exit.print();
+            while (true) {
+                if (LMB) {
+                    GetMouseCursorPos(&mCoord);
+                    if (back.isPressed(mCoord.x, mCoord.y)) {
+                        system("cls");
+                        break;
+                    }
+                    if (exit.isPressed(mCoord.x, mCoord.y)) {
+                        system("cls");
+                        world.saveFile();
+                        return;
                     }
                 }
-                break;
+            }
         }
+
         if (GetAsyncKeyState(0x57)) {
             player.moveUp(world.getMap());
         } else if (GetAsyncKeyState(0x53)) {
@@ -205,7 +204,6 @@ void loadWorld() {
             GetMouseCursorPos(&mCoord);
             for (int i = 0; i < worlds.size(); i++) {
                 if (worlds[i].isPressed(mCoord.x, mCoord.y)) {
-                    World world;
                     string dir = "saves/" + worlds[i].text + ".txt";
                     world.loadFile(dir);
                     Player player;
@@ -268,15 +266,13 @@ void loadWorld() {
                         }
 
                     }
-                    if (player.name.empty()) player.name = "Player";
                     if (world.findPlayer(player.name) != -1) {
                         player = world.players[world.findPlayer(player.name)];
-                        if (player.color != 0)
-                            world.players[world.findPlayer(player.name)].color = player.color;
+                        if (player.color != 0) world.players[world.findPlayer(player.name)].color = player.color;
                     } else {
                         world.addPlayer(player);
                     }
-                    gameLoop(player, world);
+                    gameLoop(world.players[world.findPlayer(player.name)], world);
                     break;
                 }
             }
@@ -294,7 +290,6 @@ void createWorld() {
     bool Seed = false;
     bool Size = false;
     system("cls");
-    World world;
     world.seed = 0;
     world.size = 100;
     Player player;

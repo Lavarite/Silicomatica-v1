@@ -6,10 +6,8 @@
 
 class MechanicalSieve : public Block {
 public:
-    Item in;
-    Item out;
 
-    void interact() override {
+    void interact(Inventory *inventory, int *selectedSlot, Controller *controller) override {
         system("cls");
         cout << "Sieve";
         getch();

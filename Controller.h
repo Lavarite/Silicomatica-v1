@@ -17,7 +17,6 @@ public:
 
     [[noreturn]] void handle() {
         while (true) {
-            SetConsoleMode(hStdin, ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS);
             ReadConsoleInput(hStdin, irInBuf, 1, &cNumRead);
         }
     }
