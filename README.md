@@ -1,5 +1,8 @@
 # Silicomatica-v1
 
+More versions of this project:
+[v2](https://github.com/Lavarite/Silicomatica-v2-Python) & [v3-3D](https://github.com/Lavarite/Silicomatica-3D>)
+
 Features of this version: 
  - Fully console game
  - Random landscape generation using Perlin/Simplex Noise
